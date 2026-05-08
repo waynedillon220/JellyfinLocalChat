@@ -1,5 +1,6 @@
 using MediaBrowser.Controller.Net;
-using MediaBrowser.Controller.Net.WebSocketMessages;using MediaBrowser.Controller.Net.WebSocketMessages;using MediaBrowser.Model.Session;
+using MediaBrowser.Controller.Net.WebSocketMessages;
+using MediaBrowser.Model.Session;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;

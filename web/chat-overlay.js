@@ -19,7 +19,8 @@
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
-        zIndex: 9999
+        zIndex: 9999,
+        border: "2px solid #0A7EA4"
     });
 
     // 🪟 Chat window
@@ -38,14 +39,14 @@
         flexDirection: "column",
         zIndex: 9999,
         borderRadius: "10px",
-        overflow: "hidden"
+        overflow: "hidden",
+        boxShadow: "0 0 10px rgba(10,126,164,0.5)"
     });
 
     chat.innerHTML = `
-        <div style="padding:5px;background:#222;">Local Chat</div>
-        <div id="jf-chat-messages" style="flex:1;overflow:auto;padding:5px;"></div>
-        <div id="jf-chat-typing" style="font-size:12px;padding-left:5px;"></div>
-        <input id="jf-chat-input" placeholder="Type..." style="border:none;padding:5px;width:100%;" />
+        <div style="padding:10px;background:#1a1a1a;border-bottom:1px solid #0A7EA4;">Local Chat</div>
+        <div id="jf-chat-messages" style="flex:1;overflow:auto;padding:10px;"></div>
+        <input id="jf-chat-input" placeholder="Type message..." style="border:none;border-top:1px solid #333;padding:10px;width:calc(100%-20px);background:#222;color:#fff;" />
     `;
 
     document.body.appendChild(bubble);
@@ -55,68 +56,78 @@
         chat.style.display = chat.style.display === "none" ? "flex" : "none";
     };
 
-    // 🔌 WebSocket
-    const ws = new WebSocket(`ws://${location.host}/api/LocalChat/ws`);
-
-    ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        const messages = document.getElementById("jf-chat-messages");
-
-        if (data.type === "history") {
-            data.messages.forEach(addMessage);
+    // Get user (from Jellyfin window object or use default)
+    const getUsername = () => {
+        if (window.ApiClient && window.ApiClient.userId) {
+            return "User";
         }
-
-        if (data.type === "message") {
-            addMessage(data);
-        }
-
-        if (data.type === "delete") {
-            const el = document.getElementById(data.id);
-            if (el) el.innerText = "(deleted message)";
-        }
-
-        if (data.type === "typing") {
-            document.getElementById("jf-chat-typing").innerText =
-                data.user + " is typing...";
-        }
+        return "Anonymous";
     };
 
-    function addMessage(m) {
-        const el = document.createElement("div");
-        el.id = m.id;
+    // Load and display messages from localStorage
+    const loadMessages = () => {
+        const messages = JSON.parse(localStorage.getItem("jellyfinChatMessages") || "[]");
+        const msgContainer = document.getElementById("jf-chat-messages");
+        msgContainer.innerHTML = "";
+        messages.forEach(msg => {
+            const el = document.createElement("div");
+            el.style.marginBottom = "5px";
+            el.style.padding = "5px";
+            el.style.backgroundColor = "#222";
+            el.style.borderRadius = "5px";
+            el.innerHTML = `<b style="color:#0A7EA4;">${msg.user}:</b> <span style="color:#fff;">${msg.text}</span>`;
+            msgContainer.appendChild(el);
+        });
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    };
 
-        el.innerHTML = `<b>${m.user || m.username}:</b> ${m.text || m.message}`;
+    // Save message to localStorage
+    const saveMessage = (user, text) => {
+        const messages = JSON.parse(localStorage.getItem("jellyfinChatMessages") || "[]");
+        messages.push({
+            user: user,
+            text: text,
+            timestamp: new Date().toISOString()
+        });
+        // Keep only last 100 messages
+        if (messages.length > 100) {
+            messages.shift();
+        }
+        localStorage.setItem("jellyfinChatMessages", JSON.stringify(messages));
+    };
 
-        el.oncontextmenu = (e) => {
-            e.preventDefault();
-            ws.send(JSON.stringify({ type: "delete", id: m.id }));
-        };
+    // Load initial messages
+    loadMessages();
 
-        document.getElementById("jf-chat-messages").appendChild(el);
-    }
-
+    // Handle input
     document.getElementById("jf-chat-input").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-            ws.send(JSON.stringify({
-                type: "message",
-                text: e.target.value
-            }));
+        if (e.key === "Enter" && e.target.value.trim()) {
+            const user = getUsername();
+            const text = e.target.value.trim();
+            saveMessage(user, text);
+            loadMessages();
             e.target.value = "";
-        } else {
-            ws.send(JSON.stringify({ type: "typing" }));
         }
     });
 
-    // 🎬 Hide during playback UI fade
+    // Refresh messages when storage changes (from other tabs)
+    window.addEventListener("storage", (e) => {
+        if (e.key === "jellyfinChatMessages") {
+            loadMessages();
+        }
+    });
+
+    // Hide during playback UI fade
     const observer = new MutationObserver(() => {
         const videoControls = document.querySelector(".videoOsdBottom");
-
         if (videoControls && videoControls.style.opacity === "0") {
-            bubble.style.opacity = "0";
+            bubble.style.opacity = "0.3";
             chat.style.opacity = "0";
+            chat.style.pointerEvents = "none";
         } else {
             bubble.style.opacity = "1";
             chat.style.opacity = "1";
+            chat.style.pointerEvents = "auto";
         }
     });
 
