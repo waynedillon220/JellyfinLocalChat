@@ -2,11 +2,15 @@ using MediaBrowser.Common;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Plugins;
+using MediaBrowser.Controller.Net;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace JellyfinLocalChat
 {
