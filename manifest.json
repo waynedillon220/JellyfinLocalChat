@@ -12,7 +12,7 @@
         "changelog": "Initial release with full UI auto-injection, real-time chat, and overlay.",
         "targetAbi": "10.11.6",
         "sourceUrl": "https://github.com/waynedillon220/JellyfinLocalChat/releases/download/localchat/JellyfinLocalChat.zip",
-        "checksum": "1C0825C1C7BC036E1D14ED500C412138"
+        "checksum": "98A42DBB868C9B9F4071093ECADA66EA"
       }
     ]
   }
