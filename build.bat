@@ -6,20 +6,20 @@ if exist "build" rmdir /s /q "build"
 mkdir "build"
 
 REM Build the project
-dotnet build JellyfinLocalChat/JellyfinLocalChat.csproj -c Release -o "build/JellyfinLocalChat"
+dotnet build JellyfinLocalChat\JellyfinLocalChat.csproj -c Release -o "build\JellyfinLocalChat"
 
 REM Create plugin directory structure
-mkdir "build/plugins"
-mkdir "build/plugins/JellyfinLocalChat"
+mkdir "build\plugins"
+mkdir "build\plugins\JellyfinLocalChat"
 
 REM Copy the DLL to the plugin directory
-copy "build/JellyfinLocalChat/JellyfinLocalChat.dll" "build/plugins/JellyfinLocalChat/"
+copy /Y "build\JellyfinLocalChat\JellyfinLocalChat.dll" "build\plugins\JellyfinLocalChat\JellyfinLocalChat.dll"
 
 REM Copy manifest.json to the plugin directory
-copy "manifest.json" "build/plugins/JellyfinLocalChat/"
+copy /Y "manifest.json" "build\plugins\JellyfinLocalChat\manifest.json"
 
 REM Create the ZIP file
-powershell "Compress-Archive -Path 'build/plugins/JellyfinLocalChat' -DestinationPath 'JellyfinLocalChat.zip' -Force"
+powershell "Compress-Archive -Path 'build\plugins\JellyfinLocalChat' -DestinationPath 'JellyfinLocalChat.zip' -Force"
 
 echo Build complete! Plugin ZIP created: JellyfinLocalChat.zip
 echo.
