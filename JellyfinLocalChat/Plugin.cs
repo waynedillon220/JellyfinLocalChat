@@ -33,12 +33,12 @@ namespace JellyfinLocalChat
                 new PluginPageInfo
                 {
                     Name = "chat-inject",
-                    EmbeddedResourcePath = "JellyfinLocalChat.web.inject.html"
+                    EmbeddedResourcePath = "JellyfinLocalChat.inject.html"
                 },
                 new PluginPageInfo
                 {
                     Name = "chat-overlay.js",
-                    EmbeddedResourcePath = "JellyfinLocalChat.web.chat-overlay.js"
+                    EmbeddedResourcePath = "JellyfinLocalChat.chat-overlay.js"
                 }
             };
         }
